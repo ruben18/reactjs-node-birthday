@@ -82,6 +82,36 @@ app.put('/countries/:id', async (req, res) => {
   }
 });
 
+app.delete('/countries/:id', async (req, res) => {
+  let collection = await db.collection("countries");  
+    
+  if(req.params.id=="" || req.params.id ==undefined){
+    let errorMsg ={ error: true, msg: "Record not found."};
+    res.send(errorMsg).status(404);
+    return ;
+  }
+
+  let query = {_id: new ObjectId(req.params.id.toString())};
+
+  let country = await collection.findOne(query);
+
+  if(country ==undefined || country == null){
+    let errorMsg ={ error: true, msg: "Record not found."};
+    res.send(errorMsg).status(404);
+    return ;
+  }
+
+  let result = await collection.deleteOne(query);
+
+  if(result.acknowledged == true){
+    let successMsg = { error: false, msg: "Country successfully deleted."} 
+    res.send(successMsg).status(200);
+  }else{
+    let errorMsg = { error: true, msg: result}
+    res.send(errorMsg).status(500);
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Birthday backend API app listening on port ${port}`)
