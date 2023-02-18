@@ -67,7 +67,7 @@ app.put('/countries/:id', async (req, res) => {
     res.send(errorMsg).status(400);
   }else{
     const updates = {
-      $push: { countries: body }
+      $set: { name: body.name }
     };
 
     let result = await collection.updateOne(query, updates);
