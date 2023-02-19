@@ -8,6 +8,16 @@ const port = 3000
 
 app.use(express.json());
 
+function isAuth(request, response, next){
+  const auth = request.headers.authorization;
+  if(auth == 'pwbirthdayapi'){
+    next();
+  }else{
+    response.status(401);
+    let errorMsg = {error: true, msg: "Not authorized."};
+    response.send(errorMsg)
+  }
+}
 
 app.get('/countries', async (req, res) => {
   let collection = await db.collection("countries");
@@ -18,7 +28,7 @@ app.get('/countries', async (req, res) => {
   res.send(results).status(200);
 });
 
-app.post('/countries', async (req, res) => {
+app.post('/countries', isAuth,  async (req, res) => {
   let collection = await db.collection("countries");  
   
   let body = req.body;
@@ -41,7 +51,7 @@ app.post('/countries', async (req, res) => {
   }
 });
 
-app.put('/countries/:id', async (req, res) => {
+app.put('/countries/:id', isAuth,  async (req, res) => {
   let collection = await db.collection("countries");  
     
   if(req.params.id=="" || req.params.id ==undefined){
@@ -82,7 +92,7 @@ app.put('/countries/:id', async (req, res) => {
   }
 });
 
-app.delete('/countries/:id', async (req, res) => {
+app.delete('/countries/:id', isAuth,  async (req, res) => {
   let collection = await db.collection("countries");  
     
   if(req.params.id=="" || req.params.id ==undefined){
