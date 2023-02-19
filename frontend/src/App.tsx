@@ -6,8 +6,29 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
 import Alert from 'react-bootstrap/Alert';
+import { useEffect, useState } from 'react';
+import axios from "axios";
 
-function App() {
+interface Country {
+  _id: string,
+  name: string
+}
+
+export default function App() {
+
+  const [countries, setCountries] = useState(Array<Country>);
+
+  useEffect(()=>{
+      getCountries();
+      console.log(countries)
+  },[])
+
+  const getCountries = () =>  {
+      axios.get('http://localhost:3001/countries').then((response)=>{
+        setCountries(response.data);
+      })
+  }
+
   return (
     <Container>
       <Row>
@@ -35,6 +56,11 @@ function App() {
               <Col sm={10}>
                 <Form.Select aria-label="Default select example">
                   <option>Countries</option>
+                  {countries.map((item:Country)=>{
+                    return (
+                      <option key={item._id} value={item.name}>{item.name}</option>
+                    )
+                  })}
                 </Form.Select>
               </Col>
             </Form.Group>
@@ -73,5 +99,3 @@ function App() {
     </Container>
   );
 }
-
-export default App;

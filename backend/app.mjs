@@ -1,12 +1,14 @@
 import db from "./db/conn.mjs";
 
 import express from "express";
+import cors from "cors";
 import { ObjectId } from "mongodb";
 
 const app = express()
-const port = 3000
+const port = 3001
 
 app.use(express.json());
+app.use(cors());
 
 function isAuth(request, response, next) {
   const auth = request.headers.authorization;
