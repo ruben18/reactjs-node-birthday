@@ -32,8 +32,8 @@ export default function App() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [isSaving, setSaving] = useState<boolean>(false);
 
-  const [alertPerson, setAlertPerson] = useState<Person>({ name: '', surname: '', country: '', birthday: moment().format('DD/MM/YYYY'), years: 0 });
-  const [newPerson, setNewPerson] = useState<Person>({ name: '', surname: '', country: '', birthday: moment().format('DD/MM/YYYY'), years: 0 });
+  const [alertPerson, setAlertPerson] = useState<Person>({ name: '', surname: '', country: '', birthday: "", years: 0 });
+  const [newPerson, setNewPerson] = useState<Person>({ name: '', surname: '', country: '', birthday: "", years: 0 });
 
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function App() {
     
     setTimeout(() => {
       setSaving(false);
-      setNewPerson({ name: '', surname: '', country: '', birthday: moment().format('DD/MM/YYYY'), years: 0 })
+      setNewPerson({ name: '', surname: '', country: '', birthday: "", years: 0 })
     }, 500);
 
     setAlert(newPerson);
@@ -71,7 +71,7 @@ export default function App() {
     setAlertPerson(person);
     
     setTimeout(() => {
-      setAlertPerson({ name: '', surname: '', country: '', birthday: moment().format('DD/MM/YYYY'), years: 0 });
+      setAlertPerson({ name: '', surname: '', country: '', birthday: "", years: 0 });
     }, 4000);
   }
 
@@ -120,7 +120,7 @@ export default function App() {
                 <Form.Group as={Row} className="mb-3" controlId="formBirthday">
                   <Form.Label column sm={2}>Birthday:</Form.Label>
                   <Col sm={10}>
-                    <Form.Control type="date" value={newPerson.birthday} onChange={(e) => setNewPerson({ ...newPerson, birthday: moment(new Date(e.target.value)).format('YYYY-MM-DD') })} />
+                    <Form.Control type="date" value={newPerson.birthday} onChange={(e) => setNewPerson({ ...newPerson, birthday: e.target.value.toString() })} />
                   </Col>
                 </Form.Group>
                 <Row>
