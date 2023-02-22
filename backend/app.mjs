@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import "./loadEnv.mjs";
+
 
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
@@ -8,7 +10,8 @@ main().catch(err => console.log(err));
 
 async function main() {
   mongoose.set('strictQuery', true);
-  await mongoose.connect("mongodb+srv://birthdaybackend:KZ1j0mFju3G5AqXI@cluster0.rcihdre.mongodb.net/?retryWrites=true&w=majority");
+  
+  await mongoose.connect(process.env.DB_URL || "");
 }
 
 const countrySchema = new Schema({
@@ -23,7 +26,6 @@ const Country = mongoose.model('Countries', countrySchema);
 mongoose.set('strictQuery', false);
 
 const app = express()
-const port = 3001
 
 app.use(express.json());
 app.use(cors());
@@ -47,7 +49,7 @@ app.get('/countries', async (req, res) => {
     var transformedCountries = countries.map(function (country) {
       return country.toJSON();
     });
-    res.send(transformedCountries).status(200);
+    return res.send(transformedCountries).status(200);
   });
 });
 
@@ -97,6 +99,10 @@ app.delete('/countries/:id', isAuth, async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Birthday backend API app listening on port ${port}`)
-});
+export default  app;
+
+
+
+
+
+
