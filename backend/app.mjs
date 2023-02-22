@@ -1,8 +1,26 @@
-import db from "./db/conn.mjs";
-
 import express from "express";
 import cors from "cors";
-import { ObjectId } from "mongodb";
+
+import mongoose from 'mongoose';
+const { Schema } = mongoose;
+
+main().catch(err => console.log(err));
+
+async function main() {
+  mongoose.set('strictQuery', true);
+  await mongoose.connect("mongodb+srv://birthdaybackend:KZ1j0mFju3G5AqXI@cluster0.rcihdre.mongodb.net/?retryWrites=true&w=majority");
+}
+
+const countrySchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  }
+});
+
+const Country = mongoose.model('Countries', countrySchema);
+
+mongoose.set('strictQuery', false);
 
 const app = express()
 const port = 3001
@@ -25,98 +43,57 @@ function responseMsg(res, error = false, msg = "", code = 200) {
 }
 
 app.get('/countries', async (req, res) => {
-  let collection = await db.collection("countries");
-  let results = await collection.find({})
-    .limit(50)
-    .toArray();
-
-  res.send(results).status(200);
+  Country.find({}, null, null, function (a, countries) {
+    var transformedCountries = countries.map(function (country) {
+      return country.toJSON();
+    });
+    res.send(transformedCountries).status(200);
+  });
 });
 
 app.post('/countries', isAuth, async (req, res) => {
-  let collection = await db.collection("countries");
+  try {
+    const { name } = req.body;
 
-  let body = req.body;
+    const country = new Country({
+      name
+    });
 
-  if (body.name == "" || body.name == undefined) {
-    return responseMsg(res, true, "The field name is required.", 400);
-  } else {
-    let newCountry = body;
-
-    let result = await collection.insertOne(newCountry);
-
-    if (result.acknowledged == true) {
-      return responseMsg(res, false, "Country successfully created.");
-    } else {
-      return responseMsg(res, true, result, 500);
-    }
+    await country.save();
+    return responseMsg(res, false, "Country successfully created.");
+  } catch (error) {
+    return responseMsg(res, true, error, 500);
   }
 });
 
 app.put('/countries/:id', isAuth, async (req, res) => {
-  let collection = await db.collection("countries");
+  const filter = { _id: req.params.id };
+  const update = { name: req.body.name };
 
-  if (req.params.id == "" || req.params.id == undefined) {
-    return responseMsg(res, true, "Record not found.", 404);
-  }
-  let query = "";
-  
-  try{
-    query = { _id: new ObjectId(req.params.id.toString()) };
-  }catch(ex){
-    return responseMsg(res, true, "ObjecId not valid.", 400);
-  }
+  try {
+    const count = await Country.countDocuments({ _id: req.params.id });
+    if (count == 0)
+      return responseMsg(res, true, "Record not found.", 404);
 
-  let country = await collection.findOne(query);
+    await Country.findOneAndUpdate(filter, update);
 
-  if (country == undefined || country == null) {
-    return responseMsg(res, true, "Record not found.", 404);
-  }
-
-  let body = req.body;
-
-  if (body.name == "" || body.name == undefined) {
-    return responseMsg(res, true, "The field name is required.", 400);
-  }
-  const updates = {
-    $set: { name: body.name }
-  };
-
-  let result = await collection.updateOne(query, updates);
-
-  if (result.acknowledged == true) {
     return responseMsg(res, false, "Country successfully updated.");
-  } else {
-    return responseMsg(res, true, result, 500);
+  } catch (error) {
+    return responseMsg(res, true, error, 500);
   }
 });
 
 app.delete('/countries/:id', isAuth, async (req, res) => {
-  let collection = await db.collection("countries");
+  try {
+    const count = await Country.countDocuments({ _id: req.params.id });
+    if (count == 0)
+      return responseMsg(res, true, "Record not found.", 404);
 
-  if (req.params.id == "" || req.params.id == undefined) {
-    return responseMsg(res, true, "Record not found.", 404);
-  }
+    await Country.deleteOne({ _id: req.params.id });
 
-  let query = "";
-  try{
-    query = { _id: new ObjectId(req.params.id.toString()) };
-  }catch(ex){
-    return responseMsg(res, true, "ObjecId not valid.", 400);
-  }
-
-  let country = await collection.findOne(query);
-
-  if (country == undefined || country == null) {
-    return responseMsg(res, true, "Record not found.", 404);
-  }
-
-  let result = await collection.deleteOne(query);
-
-  if (result.acknowledged == true) {
     return responseMsg(res, false, "Country successfully deleted.");
-  } else {
-    return responseMsg(res, true, result,500);
+  } catch (error) {
+    return responseMsg(res, true, error, 500);
   }
 });
 
