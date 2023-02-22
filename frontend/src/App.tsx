@@ -10,31 +10,21 @@ import { useEffect, useState } from 'react';
 import axios from "axios";
 import moment from 'moment';
 import { Spinner } from 'react-bootstrap';
-
-
-interface Country {
-  _id: string,
-  name: string
-}
-
-interface Person {
-  name: string,
-  surname: string,
-  country: string,
-  birthday: string,
-  years: number
-}
+import { useAppSelector, useAppDispatch } from './hooks'
+import { addPerson } from './personsSlice';
+import { Country, Person } from './types';
 
 export default function App() {
 
+  const persons = useAppSelector((state) => state.persons.persons)
+  const dispatch = useAppDispatch()
+
   const [countries, setCountries] = useState(Array<Country>);
-  const [persons, setPersons] = useState(Array<Person>);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [isSaving, setSaving] = useState<boolean>(false);
 
   const [alertPerson, setAlertPerson] = useState<Person>({ name: '', surname: '', country: '', birthday: "", years: 0 });
   const [newPerson, setNewPerson] = useState<Person>({ name: '', surname: '', country: '', birthday: "", years: 0 });
-
 
   useEffect(() => {
     if (countries.length === 0) {
@@ -51,8 +41,11 @@ export default function App() {
 
   const saveNewPerson = (e: any) => {
     e.preventDefault();
-    setPersons([...persons, newPerson]);
     
+    var years = moment().diff(newPerson.birthday, 'years', true);
+
+    dispatch(addPerson({...newPerson, years: Math.floor(years) }));
+
     setSaving(true);
     
     setTimeout(() => {
@@ -60,19 +53,15 @@ export default function App() {
       setNewPerson({ name: '', surname: '', country: '', birthday: "", years: 0 })
     }, 500);
 
-    setAlert(newPerson);
+    setAlert(newPerson, Math.floor(years));
   }
 
-  const setAlert = (person: Person) => {
-    var years = moment().diff(person.birthday, 'years', true);
-
-    person.years= Math.floor(years);
-
-    setAlertPerson(person);
+  const setAlert = (person: Person, years: number) => {
+    setAlertPerson({...person, years: years});
     
     setTimeout(() => {
       setAlertPerson({ name: '', surname: '', country: '', birthday: "", years: 0 });
-    }, 4000);
+    }, 6000);
   }
 
   return (
@@ -169,7 +158,7 @@ export default function App() {
                     :
                     persons.map((person: Person, idx: number) => {
                       return (
-                        <tr key={idx} onClick={() => setAlert(person)}>
+                        <tr key={idx} onClick={() => setAlert(person, person.years)}>
                           <td>{person.name} {person.surname}</td>
                           <td>{person.country}</td>
                           <td>{person.birthday.toString()}</td>
