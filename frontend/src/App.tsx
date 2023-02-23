@@ -42,6 +42,11 @@ export default function App() {
   const saveNewPerson = (e: any) => {
     e.preventDefault();
     
+    if(newPerson.name==="" || newPerson.surname ==="" || newPerson.country==="" || newPerson.birthday === ""){
+      alert("All fields are required.");
+      return;
+    }
+
     var years = moment().diff(newPerson.birthday, 'years', true);
 
     dispatch(addPerson({...newPerson, years: Math.floor(years) }));
