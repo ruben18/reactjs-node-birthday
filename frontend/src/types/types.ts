@@ -13,5 +13,6 @@ export interface Person {
 
 
 export interface CounterState {
-    persons: Array<Person>
+    persons: Array<Person>,
+    currentPerson: Person
 }
