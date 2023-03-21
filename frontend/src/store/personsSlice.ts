@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from './store';
 
-import { CounterState, Person } from './types';
+import { CounterState, Person } from '../types/types';
 
 const initialState: CounterState = {
   persons: []

@@ -1,4 +1,4 @@
-import './App.css';
+import './assets/css/App.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -10,9 +10,9 @@ import { useEffect, useState } from 'react';
 import axios from "axios";
 import moment from 'moment';
 import { Spinner } from 'react-bootstrap';
-import { useAppSelector, useAppDispatch } from './hooks'
-import { addPerson } from './personsSlice';
-import { Country, Person } from './types';
+import { useAppSelector, useAppDispatch } from './store/hooks'
+import { addPerson } from './store/personsSlice';
+import { Country, Person } from './types/types';
 
 export default function App() {
 
